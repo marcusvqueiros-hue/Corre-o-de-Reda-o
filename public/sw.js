@@ -5,7 +5,7 @@ const TILE_CACHE = 'elo-tiles-v1';
 const MAX_TILES = 3000;
 const SHELL = [
   '/index.html', '/manifest.webmanifest', '/css/app.css', '/icons/icon.svg', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/apple-touch-icon.png',
-  '/js/main.js', '/js/state.js', '/js/util.js', '/js/db.js', '/js/net.js', '/js/sound.js', '/js/geo.js', '/js/map.js', '/js/ui.js',
+  '/js/main.js', '/js/config.js', '/js/supa.js', '/js/state.js', '/js/util.js', '/js/db.js', '/js/net.js', '/js/sound.js', '/js/geo.js', '/js/map.js', '/js/ui.js',
   '/js/view-join.js', '/js/view-chats.js', '/js/view-map.js', '/js/view-people.js', '/js/view-settings.js',
 ];
 

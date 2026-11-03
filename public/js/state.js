@@ -3,6 +3,7 @@ import { db } from './db.js';
 import { Net } from './net.js';
 import { uuid, dmChannel, dmOther } from './util.js';
 import { beep, vibrate } from './sound.js';
+import { cloud, SupaNet, backend } from './supa.js';
 
 const listeners = new EventTarget();
 export const emit = (name, detail) => listeners.dispatchEvent(new CustomEvent(name, { detail }));
@@ -39,7 +40,7 @@ export const S = {
   authError: null,
 };
 
-export const net = new Net();
+export const net = cloud ? new SupaNet() : new Net();
 const outbox = new Map();
 
 // ---------- persistência ----------
@@ -87,27 +88,29 @@ function wsUrl() {
 
 export async function refreshInfo() {
   try {
-    const r = await fetch(serverBase() + '/api/info', { cache: 'no-store' });
-    S.info = await r.json();
+    S.info = cloud ? await backend.info() : await (await fetch(serverBase() + '/api/info', { cache: 'no-store' })).json();
     saveKv('info', S.info);
     emit('info');
   } catch (_) { /* offline: usa o último conhecido */ }
 }
 
 // ---------- entrar / sair ----------
-export async function join({ name, code, adminPassword }) {
-  let r;
-  try {
-    r = await fetch(serverBase() + '/api/join', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, code, adminPassword: adminPassword || undefined, deviceId: S.deviceId }),
-    });
-  } catch (_) {
-    throw new Error('Sem conexão com o servidor. Conecte-se à rede local (Wi-Fi do administrador) e tente de novo.');
-  }
+async function joinRequest(body) {
+  if (cloud) return backend.join(body);
+  const r = await fetch(serverBase() + '/api/join', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...body, adminPassword: body.adminPassword || undefined }) });
   const d = await r.json().catch(() => ({}));
-  if (!r.ok) {
+  if (!r.ok && !d.error) d.error = 'http';
+  return d;
+}
+
+export async function join({ name, code, adminPassword }) {
+  let d;
+  try {
+    d = await joinRequest({ name, code, adminPassword, deviceId: S.deviceId });
+  } catch (_) {
+    throw new Error('Sem conexão com o servidor. Verifique a internet/rede local e tente de novo.');
+  }
+  if (d.error) {
     const msg = { code: 'Código de acesso incorreto.', admin_password: 'Senha de administrador incorreta.', banned: 'Acesso bloqueado pelo administrador.', rate: 'Muitas tentativas. Aguarde alguns minutos.', admin_required: 'Este aparelho é de um administrador: informe a senha.', name: 'Informe um nome.' }[d.error];
     throw new Error(msg || 'Não foi possível entrar.');
   }
@@ -384,6 +387,7 @@ export const chTitle = (ch) => {
 };
 
 export async function exportFile(kind) {
+  if (cloud) return backend.exportBlob(S.session.token, kind);
   const path = kind === 'geojson' ? '/api/export/locations.geojson' : '/api/export/messages.csv';
   const r = await fetch(serverBase() + path, { headers: { Authorization: 'Bearer ' + S.session.token } });
   if (!r.ok) throw new Error('Falha na exportação (precisa estar conectado).');

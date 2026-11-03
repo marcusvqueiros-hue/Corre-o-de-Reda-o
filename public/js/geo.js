@@ -1,6 +1,7 @@
 // Compartilhamento de localização com fila offline: pontos coletados sem rede são enviados em lote ao reconectar.
 import { S, net, emit, on } from './state.js';
 import { db } from './db.js';
+import { cloud } from './supa.js';
 
 let watchId = null;
 let lastSent = null;
@@ -41,7 +42,7 @@ function onFix(pos, force) {
 }
 
 async function report(p) {
-  if (net.state === 'online' && !draining && !(await db.count('locq'))) {
+  if (!cloud && net.state === 'online' && !draining && !(await db.count('locq'))) {
     net.send({ t: 'loc', p });
   } else {
     await db.put('locq', { ...p });

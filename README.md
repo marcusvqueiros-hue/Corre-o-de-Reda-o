@@ -67,6 +67,18 @@ Sem instalar o certificado ainda dá para usar o **modo básico** (`http://IP:80
 
 ---
 
+## Modo nuvem (Vercel + Supabase)
+
+Com internet, o mesmo app roda **sem servidor próprio**: a interface fica na Vercel (HTTPS de verdade, sem instalar certificado) e as mensagens/posições ficam no Supabase.
+
+- `public/js/config.js` aponta para o projeto Supabase. Deixe `CONFIG = {}` (ou use o servidor local, que já entrega um `config.js` vazio) para voltar ao modo local.
+- O backend é `supabase/migrations/*.sql`: tabelas num schema **privado** (`elo`) e funções RPC que validam token, papel e visibilidade (DM só para os dois lados; localização só para o admin, ou todos se o admin ligar).
+- Sincronização por *polling* adaptativo (2,5 s em primeiro plano, 15 s em segundo plano). Fila de envio e fila de GPS continuam funcionando: sem internet, tudo fica salvo e é enviado ao voltar.
+- Senha do administrador: guardada só como hash no banco; troque em *Ajustes › Administração*.
+- A chave `sb_publishable_…` é pública por projeto; a segurança está nas funções RPC (limite de tentativas na senha do admin incluído).
+- **Trade-off:** o modo nuvem **precisa de internet**. Para o cenário sem internet (queda geral) use o modo servidor local.
+- Testes: `node test/cloud-shim.test.js` (transporte) e `node test/e2e-cloud.js` (interface com Chromium).
+
 ## Recursos
 
 **Para todos**

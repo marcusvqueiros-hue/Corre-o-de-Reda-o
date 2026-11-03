@@ -154,7 +154,7 @@ end $$;
 
 create function public.elo_send(p_token text, p_msg jsonb) returns jsonb language plpgsql security definer set search_path='' as $$
 declare u elo.users := elo.auth(p_token); v_id text := p_msg->>'id'; v_ch text := coalesce(p_msg->>'ch',''); v_kind text := coalesce(p_msg->>'kind','text');
-        v_text text := left(replace(coalesce(p_msg->>'text',''), chr(0), ''), 4000); v_img text; v_loc jsonb; v_cts bigint; v_a text; v_b text; v_o elo.users;
+        v_text text := left(coalesce(p_msg->>'text',''), 4000); v_img text; v_loc jsonb; v_cts bigint; v_a text; v_b text; v_o elo.users;
         v_m elo.messages; v_lat double precision; v_lng double precision;
   ack constant text := 'ack';
 begin

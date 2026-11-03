@@ -1,6 +1,7 @@
 import { h, ic, uuid } from './util.js';
 import { S, join, setPref, refreshInfo, on } from './state.js';
 import { field, logoSvg } from './ui.js';
+import { cloud } from './supa.js';
 
 export function renderJoin(root) {
   let adminMode = false;
@@ -36,7 +37,7 @@ export function renderJoin(root) {
       if (!adminMode && !consent.checked) { err.textContent = 'Para participar é preciso aceitar compartilhar a localização com o comando.'; return; }
       btn.disabled = true; btn.textContent = 'CONECTANDO…';
       try {
-        setPref('serverUrl', server.value.trim());
+        if (!cloud) setPref('serverUrl', server.value.trim());
         setPref('consent', adminMode ? S.prefs.consent : true);
         if (!adminMode) setPref('share', true);
         await join({ name: name.value, code: code.value, adminPassword: adminMode ? pass.value : '' });
@@ -49,7 +50,7 @@ export function renderJoin(root) {
     h('div', { class: 'logo' }, logoSvg(76), h('h1', null, 'ELO'), h('div', { class: 'tag' }, 'Comunicação de emergência · funciona sem internet')),
     field('Seu nome', name),
     codeField, passField, consentBox,
-    h('details', { class: 'adv' }, h('summary', null, 'Opções avançadas'), field('Endereço do servidor', server, 'Só altere se o comando informar outro endereço.')),
+    !cloud && h('details', { class: 'adv' }, h('summary', null, 'Opções avançadas'), field('Endereço do servidor', server, 'Só altere se o comando informar outro endereço.')),
     err, btn,
     h('div', { style: { textAlign: 'center', marginTop: '14px', fontSize: '13px' } }, toggleAdmin),
     !window.isSecureContext && h('p', { class: 'mut', style: { fontSize: '12.5px', marginTop: '14px' } }, '⚠ Conexão não segura: GPS e uso offline ficam desativados. Peça o link HTTPS ao comando.'));

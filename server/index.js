@@ -197,6 +197,10 @@ function makeHandler(secure) {
         if (!f.startsWith(LOCAL_TILES_DIR + path.sep)) { res.writeHead(403); return res.end(); }
         return serveFile(req, res, f, { 'Cache-Control': 'public, max-age=604800' });
       }
+      if (p === '/js/config.js') { // modo servidor local: sem nuvem
+        res.writeHead(200, { 'Content-Type': MIME['.js'], 'Cache-Control': 'no-cache', 'X-Content-Type-Options': 'nosniff' });
+        return res.end('export const CONFIG = {};\n');
+      }
       if (!secure && tlsMaterial && p === '/') p = '/landing.html';
       if (p === '/app') p = '/index.html';
       if (p.endsWith('/')) p += 'index.html';

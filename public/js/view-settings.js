@@ -3,6 +3,7 @@ import { S, on, emit, setPref, setStatus, rename, admin, logout, exportFile, net
 import { field, toggleRow, toast, confirmDialog } from './ui.js';
 import * as geo from './geo.js';
 import { db } from './db.js';
+import { cloud, backend } from './supa.js';
 
 let installEvt = null;
 window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installEvt = e; emit('installable'); });
@@ -47,12 +48,18 @@ export function renderSettings(root) {
   const adminCard = isAdmin && (() => {
     const code = h('input', { class: 'input', value: S.settings.accessCode || '', placeholder: 'vazio = qualquer pessoa pode entrar', maxLength: 40 });
     const group = h('input', { class: 'input', value: S.settings.groupName || 'Geral', maxLength: 30 });
+    const pw = h('input', { class: 'input', type: 'password', placeholder: 'Nova senha (mín. 8 caracteres)', autocomplete: 'new-password', maxLength: 72 });
     const motd = h('textarea', { class: 'input', rows: 2, value: S.settings.motd || '', placeholder: 'Mensagem fixa exibida a todos no topo do app', maxLength: 280 });
     return h('div', null, h('div', { class: 'h-sec' }, 'Administração'),
       h('div', { class: 'card' },
         toggleRow('Mapa visível para todos', 'Se ligado, todos veem a posição dos outros. Desligado: só o comando vê.', !!S.settings.shareMap, (v) => admin('setting', { shareMap: v })),
         field('Código de acesso', code), field('Nome do grupo geral', group), field('Mensagem fixa', motd),
         h('button', { class: 'btn primary', onclick: () => { admin('setting', { accessCode: code.value, groupName: group.value, motd: motd.value }); toast('Configurações salvas', 'ok'); } }, 'Salvar'),
+        cloud && h('div', { class: 'h-sec', style: { marginTop: '18px' } }, 'Senha do administrador'),
+        cloud && h('div', { class: 'row-actions', style: { flexWrap: 'nowrap' } }, pw, h('button', { class: 'btn', onclick: async () => {
+          if (pw.value.length < 8) return toast('Use ao menos 8 caracteres', 'err');
+          try { await backend.setAdminPassword(S.session.token, pw.value); pw.value = ''; toast('Senha alterada', 'ok'); } catch (e) { toast('Não foi possível alterar a senha', 'err'); }
+        } }, 'Alterar')),
         h('div', { class: 'h-sec', style: { marginTop: '18px' } }, 'Exportar dados'),
         h('div', { class: 'row-actions' },
           h('button', { class: 'btn', onclick: () => exp('geojson') }, ic('download', 18), 'Posições (GeoJSON)'),
