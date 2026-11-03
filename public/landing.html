@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ELO — Primeiro acesso</title>
+  <meta name="theme-color" content="#04070f">
+  <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/app.css">
+  <style>body{position:static;overflow:auto;height:auto}#app{height:auto}</style>
+</head>
+<body>
+  <div class="landing">
+    <h1>ELO</h1>
+    <p class="mut">Chat de emergência com localização. Para o app funcionar <b>sem internet</b> e usar o GPS, o navegador exige uma conexão segura (HTTPS). Faça esta configuração <b>uma única vez</b>, de preferência antes de precisar.</p>
+
+    <h2 class="h-sec">1 · Instale o certificado deste servidor</h2>
+    <p><a class="btn primary" href="/ca.crt" download>Baixar certificado (elo-ca.crt)</a></p>
+    <details><summary><b>Android</b></summary>
+      <ol><li>Abra o arquivo baixado (ou Ajustes › Segurança › Criptografia e credenciais › Instalar um certificado › <b>Certificado de CA</b>).</li><li>Confirme o aviso e selecione <code>elo-ca.crt</code>.</li></ol></details>
+    <details><summary><b>iPhone / iPad</b></summary>
+      <ol><li>Toque em baixar e permita o perfil.</li><li>Ajustes › Geral › VPN e Gerenciamento de Dispositivo › instale o perfil <b>ELO Chat Local CA</b>.</li><li>Ajustes › Geral › Sobre › Ajustes de Confiança de Certificado › ative a confiança total.</li></ol></details>
+    <details><summary><b>Windows / macOS / Linux</b></summary>
+      <ol><li>Windows: abra o arquivo › Instalar certificado › Computador local › "Autoridades de Certificação Raiz Confiáveis".</li><li>macOS: Acesso às Chaves › importar › Confiar sempre.</li></ol></details>
+
+    <h2 class="h-sec">2 · Abra o app seguro e instale-o</h2>
+    <p><a class="btn primary" id="secure" href="#">Abrir ELO (HTTPS)</a></p>
+    <p class="mut">Depois de abrir, use o menu do navegador › <b>Instalar app</b> / <b>Adicionar à tela inicial</b>. Daí em diante o app abre mesmo sem rede.</p>
+
+    <h2 class="h-sec">Sem instalar o certificado?</h2>
+    <p class="mut">Dá para usar o <a href="/app">modo básico (HTTP)</a>: o chat funciona, mas sem GPS e sem cache offline do app.</p>
+    <p class="mut mono" style="font-size:11px" id="addr"></p>
+  </div>
+  <script src="/js/landing.js"></script>
+</body>
+</html>

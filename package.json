@@ -1,0 +1,13 @@
+{
+  "name": "elo-emergency-chat",
+  "version": "1.0.0",
+  "description": "ELO — chat de emergência offline-first (PWA) com mapa de localização para o administrador. Zero dependências.",
+  "private": true,
+  "license": "MIT",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "start": "node server/index.js",
+    "icons": "node scripts/make-icons.js",
+    "test": "node test/protocol.test.js"
+  }
+}
