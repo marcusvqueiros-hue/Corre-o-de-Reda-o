@@ -28,7 +28,8 @@ export function fromB64u(text: string): Bytes {
 }
 
 export function utf8(text: string): Bytes {
-  return new TextEncoder().encode(text) as Bytes;
+  // new Uint8Array(...) garante um array do realm atual (o libsodium valida com instanceof)
+  return new Uint8Array(new TextEncoder().encode(text));
 }
 
 export function randomBytes(length: number): Bytes {
